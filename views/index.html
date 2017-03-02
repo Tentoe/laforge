@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>First Test for page</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="lib/jquery.knob.js"></script>
+    <script>
+        $(function() {
+            $(".dial").knob();
+        });
+    </script>
+</head>
+
+<body>
+    <div class="jumbotron text-center" style="background-color:yellow;">
+        <h1>My First Bootstrap Page</h1>
+    </div>
+    <div class="row" style="text-align: center;">
+        <div class="col-sm-2 col-sm-offset-2" style="background-color:lavender; ">
+            <input type="text" value="22.1" class="dial" data-fgColor="Yellow" data-min="10" data-max="40" data-angleOffset=-125 data-angleArc=250 readonly>
+
+
+        </div>
+    </div>
+
+</body>
+
+</html>
