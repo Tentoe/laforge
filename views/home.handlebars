@@ -1,13 +1,18 @@
 <div class="row" style="text-align: center;">
-    <div class="col-sm-4" style="background-color:lavender; ">
+    <div class="col-sm-4" style="height:330px;background-color:lavender;">
+        <!-- TODO background-color is just for debug edit out -->
 
 
-        <input type="text" value="22.1" class="dial" data-fgColor="Yellow" data-min="2" data-max="40" data-angleOffset=-125 data-angleArc=250 readonly>
-        <script>
-            $(function() {
-                $(".dial").knob();
-            });
-        </script>
+        <div>target 21°C</div>
+
+
+            <div class="absolute-center" style="top:80px;">
+                <input class="knob target" value="21°C" data-fgColor="Orange" data-displayInput="false" data-min="2" data-max="40" data-width="200" data-height="200" data-angleOffset=-125 data-angleArc=250 data-thickness=".2" readonly>
+            </div>
+            <div class="absolute-center" style="font-size:40px;top:140px">21°C</div>
+            <div class="absolute-center" style="top:30px;">
+                <input value="22.1" class="knob" data-displayInput="false" data-width="300" data-height="300" data-min="2" data-max="40" data-angleOffset=-125 data-angleArc=250>
+            </div>
 
     </div>
 </div>
