@@ -9,7 +9,7 @@ const handlebars = require("express-handlebars").create({
 
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
-
+const expressSession = require('express-session');
 
 const sslDir = "ssl";
 const cred = {
@@ -23,6 +23,14 @@ app.use(bodyParser.urlencoded({
     extended: false
 }));
 app.use(cookieParser());
+app.use(expressSession({
+    secret: 'a long save secret, that noone can guess',
+    resave: false,
+    saveUninitialized: false
+}));
+
+
+
 
 //engine
 app.engine("handlebars", handlebars.engine);
@@ -32,6 +40,7 @@ app.set('portssl', process.env.PORTSSL || 4444);
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'handlebars');
+
 
 //routes
 const routes = require("./routes/home")
