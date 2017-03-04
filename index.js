@@ -13,6 +13,9 @@ const cred = {
     cert: fs.readFileSync(path.join(__dirname, sslDir, "new.cert.cert"))
 };
 
+//routes
+const routes = require("./routes/home")
+app.use('/', routes);
 
 app.engine("handlebars", handlebars.engine);
 
