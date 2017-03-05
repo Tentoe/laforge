@@ -26,7 +26,11 @@ app.use(cookieParser());
 app.use(expressSession({
     secret: 'a long save secret, that noone can guess',
     resave: false,
-    saveUninitialized: false
+    rolling: true,
+    saveUninitialized: false,
+    cookie: {
+        maxAge: 600000
+    }
 }));
 
 
@@ -43,8 +47,8 @@ app.set('view engine', 'handlebars');
 
 
 //routes
-const routes = require("./routes/home")
-app.use('/', routes);
+app.use('/', require("./routes/home"));
+
 app.use(express.static(path.join(__dirname, "public")));
 
 // catch 404 and forward to error handler
@@ -61,9 +65,12 @@ app.use(function(err, req, res, next) {
     //res.locals.error = req.app.get('env') === 'development' ? err : {};
 
     // render the error page
+    var vars = {
+        loggedIn: req.session.loggedIn || false
+    };
     res.status(err.status || 500);
-    if (err.status === 404) res.render('404');
-    else res.render("500");
+    if (err.status === 404) res.render('404', vars);
+    else res.render("500", vars);
 });
 
 
