@@ -8,9 +8,18 @@
 
 <script src="lib/jquery.knob.min.js"></script>
 
-
 <script>
+    function setNewTarget(target) {
+        $("#newTarget").text("target " + target + "°C");
+    };
+
     $(function() {
-        $(".knob").knob();
+        $(".knob").knob({
+            'change': function() { setNewTarget($("#target").val()); }
+        });
+        setNewTarget({{target}});
     });
+
+
+
 </script>

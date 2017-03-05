@@ -1,6 +1,6 @@
 var crypto = require('crypto');
 var express = require('express');
-
+var piheat = require("../piheat");
 
 var fs = require("fs");
 
@@ -11,7 +11,9 @@ router.get('/', function(req, res) {
     req.session.loggedIn = req.session.loggedIn || false;
 
     res.render("home", {
-        loggedIn: req.session.loggedIn
+        loggedIn: req.session.loggedIn,
+        temp: piheat.getTemp(),
+        target: piheat.getTarget()
     });
 });
 
@@ -20,8 +22,6 @@ router.post('/', function(req, res) {
     req.body.password = md5hash(req.body.password);
 
 
-
-    ;
 
     req.session.loggedIn = passwordValid(req.body.password);
 
