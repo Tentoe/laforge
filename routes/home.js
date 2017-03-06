@@ -26,7 +26,9 @@ router.post('/', function(req, res) {
     req.session.loggedIn = passwordValid(req.body.password);
 
     res.render("home", { //TODO write to session validate password activate stuff etc
-        loggedIn: req.session.loggedIn
+        loggedIn: req.session.loggedIn,
+        temp: piheat.getTemp(),
+        target: piheat.getTarget()
     });
 
 

@@ -7,7 +7,7 @@
             <div class="absolute-center" style="top:80px;">
                 <input value= {{temp}} class="knob" data-fgColor="Orange" data-displayInput="false" data-min="2" data-max="40" data-width="200" data-height="200" data-angleOffset=-125 data-angleArc=250 data-thickness=".2" readonly>
             </div>
-            <div class="absolute-center" style="font-size:40px;top:140px">21°C</div>
+            <div class="absolute-center" style="font-size:40px;top:140px">{{temp}}°C</div>
             <div class="absolute-center" style="top:30px;">
                 <input id="target" value= {{target}} class="knob" data-displayInput="false" data-width="300" data-height="300" data-min="2" data-max="40" data-angleOffset=-125 data-angleArc=250 {{#unless loggedIn}} readonly {{/unless}}>
             </div>
