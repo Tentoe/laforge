@@ -1,12 +1,9 @@
 module.exports = {
     getCelsius: function() {
-
-        return 12.34;
-
+        return Promise.resolve(12.34);
     },
-    setHeating: function(value) {
-        console.log("turned heating " + value);
+    setHeating: function(on) {
+        console.log("turned heating " + on);
+        return Promise.resolve(on);
     }
-
-
 }

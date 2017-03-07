@@ -9,12 +9,15 @@ var router = express.Router();
 router.get('/', function(req, res) {
 
     req.session.loggedIn = req.session.loggedIn || false;
+    piheat.getTemp()
+        .then(function(temp) {
+            res.render("home", {
+                loggedIn: req.session.loggedIn,
+                temp: temp,
+                target: piheat.getTarget()
+            });
+        }); //TODO Catch
 
-    res.render("home", {
-        loggedIn: req.session.loggedIn,
-        temp: piheat.getTemp(),
-        target: piheat.getTarget()
-    });
 });
 
 router.post('/', function(req, res) {
@@ -27,8 +30,8 @@ router.post('/', function(req, res) {
 
     res.render("home", { //TODO write to session validate password activate stuff etc
         loggedIn: req.session.loggedIn,
-        temp: piheat.getTemp(),
-        target: piheat.getTarget()
+        temp: 0,
+        target: 0
     });
 
 
