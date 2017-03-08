@@ -1,34 +1,35 @@
 {
-  "name": "laforge",
-  "version": "1.0.0",
-  "description": "A System to control my radiator with a Raspberry Pi over a web interface. ",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Tentoe/laforge.git"
-  },
-  "keywords": [
-    "raspberry",
-    "pi",
-    "heating",
-    "thermometer"
-  ],
-  "author": "Keven Kurz",
-  "license": "GPL-3.0",
-  "bugs": {
-    "url": "https://github.com/Tentoe/laforge/issues"
-  },
-  "homepage": "https://github.com/Tentoe/laforge#readme",
-  "dependencies": {
-    "body-parser": "^1.17.0",
-    "cookie-parser": "^1.4.3",
-    "express": "^4.15.0",
-    "express-handlebars": "^3.0.0",
-    "express-session": "^1.15.1",
-    "mongodb": "^2.2.24",
-    "onoff": "^1.1.2"
-  }
+    "name": "laforge",
+    "version": "1.0.0",
+    "description": "A System to control my radiator with a Raspberry Pi over a web interface. ",
+    "main": "app.js",
+    "scripts": {
+        "start": "node app.js",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Tentoe/laforge.git"
+    },
+    "keywords": [
+        "raspberry",
+        "pi",
+        "heating",
+        "thermometer"
+    ],
+    "author": "Keven Kurz",
+    "license": "GPL-3.0",
+    "bugs": {
+        "url": "https://github.com/Tentoe/laforge/issues"
+    },
+    "homepage": "https://github.com/Tentoe/laforge#readme",
+    "dependencies": {
+        "body-parser": "^1.17.0",
+        "cookie-parser": "^1.4.3",
+        "express": "^4.15.0",
+        "express-handlebars": "^3.0.0",
+        "express-session": "^1.15.1",
+        "mongodb": "^2.2.24",
+        "onoff": "^1.1.2"
+    }
 }

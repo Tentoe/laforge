@@ -1,4 +1,4 @@
-var piio = require("./piioDUMMY");
+var piio = require("./piio");
 
 var target = 21;
 
@@ -22,7 +22,9 @@ var cycleTimeout = null;
 
 
 function valueInTolerance(value) {
+
     var diff = value - target;
+
     if (Math.abs(diff) > targetTolerance) return false;
     else return true;
 };
@@ -38,56 +40,56 @@ function cycleControl() {
     //TODO implement heating hours
 
 
-    var data = piio.getCelsius();
+    piio.getCelsius().then(function(data) {
 
 
 
-    var targetDiv = data - target;
+        var targetDiv = data - target;
 
-    var lastTempBuffer = lastTemp;
-    lastTemp = data;
+        var lastTempBuffer = lastTemp;
+        lastTemp = data;
 
-    //Heat/Cool until we are in targetMargin
-    if (!valueInTolerance(data)) {
-        //adjust state
-        if (valueInTolerance(lastTempBuffer)) {
+        //Heat/Cool until we are in targetMargin
+        if (!valueInTolerance(data)) {
+            //adjust state
+            if (valueInTolerance(lastTempBuffer)) {
 
-            if (targetDiv < 0) {
-                state.value += state.step;
-            } else {
-                state.value -= state.step;
+                if (targetDiv < 0) {
+                    state.value += state.step;
+                } else {
+                    state.value -= state.step;
+                }
+
+                state.value = fixMinMax(state.value);
             }
 
-            state.value = fixMinMax(state.value);
+
+            if (targetDiv < 0) {
+                on = true;
+                piio.setHeating(on);
+                console.log("heating to margin");
+            } else {
+                on = false;
+                piio.setHeating(on);
+                console.log("cooling to margin");
+            }
+
+            cycleTimeout = setTimeout(cycleControl, cycleDurationMargin);
+            return;
         }
 
-
-        if (targetDiv < 0) {
-            on = true;
-            piio.setHeating(on);
-            console.log("heating to margin");
-        } else {
-            on = false;
-            piio.setHeating(on);
-            console.log("cooling to margin");
-        }
-
-        cycleTimeout = setTimeout(cycleControl, cycleDurationMargin);
-        return;
-    }
-
-    console.log(state);
+        console.log(state);
 
 
-    on = !on; //TODO read back value
-    //initiate cooling cycle
-    piio.setHeating(on);
+        on = !on; //TODO read back value
+        //initiate cooling cycle
+        piio.setHeating(on);
 
-    var duration = on ? cycleDuration * state.value : cycleDuration * (1 - state.value);
+        var duration = on ? cycleDuration * state.value : cycleDuration * (1 - state.value);
 
-    console.log("Heating:" + on + "for " + duration + "ms ");
-    cycleTimeout = setTimeout(cycleControl, duration);
-
+        console.log("Heating:" + on + "for " + duration + "ms ");
+        cycleTimeout = setTimeout(cycleControl, duration);
+    });
 };
 
 

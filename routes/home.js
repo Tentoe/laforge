@@ -5,37 +5,52 @@ var piheat = require("../piheat");
 var fs = require("fs");
 
 var router = express.Router();
+
+
+function getVars(session) {
+    return piheat.getTemp().then(function(temp) {
+        return {
+            loggedIn: session.loggedIn,
+            temp: temp,
+            target: piheat.getTarget()
+        }
+    });
+}
+
 // Get Homepage
 router.get('/', function(req, res) {
 
     req.session.loggedIn = req.session.loggedIn || false;
-    piheat.getTemp()
-        .then(function(temp) {
-            res.render("home", {
-                loggedIn: req.session.loggedIn,
-                temp: temp,
-                target: piheat.getTarget()
-            });
-        }); //TODO Catch
+
+    getVars(req.session).then(function(val) {
+        res.render("home", val);
+    }); //TODO Catch
+
 
 });
 
 router.post('/', function(req, res) {
+    console.log("post");
+    if (req.body.password) {
 
-    req.body.password = md5hash(req.body.password);
+        req.body.password = md5hash(req.body.password);
+        req.session.loggedIn = passwordValid(req.body.password);
+    }
+
+    if (req.body.target && req.session.loggedIn) {
+        piheat.setNewTarget(parseFloat(req.body.target));
+    }
 
 
-
-    req.session.loggedIn = passwordValid(req.body.password);
-
-    res.render("home", { //TODO write to session validate password activate stuff etc
-        loggedIn: req.session.loggedIn,
-        temp: 0,
-        target: 0
-    });
+    getVars(req.session).then(function(val) {
+        res.render("home", val);
+    }); //TODO Catch
 
 
 });
+
+
+
 
 router.get('/logout', function(req, res) {
 
@@ -51,7 +66,7 @@ function md5hash(str) {
 
 function passwordValid(pass) {
 
-    var passwords = fs.readFileSync("passwords.md5").toString().split(/\r?\n/).reduce(function(acc, val) {
+    var passwords = fs.readFileSync("passwords.md5").toString().split(/\r?\n/).reduce(function(acc, val) { // TODO assync
         return val !== "" ? acc.concat(val) : acc; //remove all empty strings (eof creates an empty string)
     }, []);
 
@@ -64,4 +79,7 @@ function passwordValid(pass) {
 
 
 
+
+
 module.exports = router;
+router;
