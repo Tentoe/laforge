@@ -41,3 +41,6 @@ jspm_packages
 *.pem
 *.cert
 *.csr
+
+# password file
+passwords.md5
