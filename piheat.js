@@ -1,4 +1,4 @@
-var piio = require("./piio");
+var piio = require("./piioDUMMY");
 
 var target = 21;
 
@@ -67,18 +67,18 @@ function cycleControl() {
             if (targetDiv < 0) {
                 on = true;
                 piio.setHeating(on);
-                console.log("heating to margin");
+                //TODO  console.log("heating to margin");
             } else {
                 on = false;
                 piio.setHeating(on);
-                console.log("cooling to margin");
+                //TODO  console.log("cooling to margin");
             }
 
             cycleTimeout = setTimeout(cycleControl, cycleDurationMargin);
             return;
         }
 
-        console.log(state);
+        //TODO  console.log(state);
 
 
         on = !on; //TODO read back value
@@ -87,7 +87,7 @@ function cycleControl() {
 
         var duration = on ? cycleDuration * state.value : cycleDuration * (1 - state.value);
 
-        console.log("Heating:" + on + "for " + duration + "ms ");
+        //TODO  console.log("Heating:" + on + "for " + duration + "ms ");
         cycleTimeout = setTimeout(cycleControl, duration);
     });
 };
