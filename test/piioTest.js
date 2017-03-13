@@ -1,4 +1,4 @@
-const piio = require("../piioDUMMY");
+const piio = require("../piio");
 const assert = require('assert');
 
 describe('piio', function() {

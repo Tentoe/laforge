@@ -1,4 +1,4 @@
-var piio = require("./piioDUMMY");
+var piio = require("./piio");
 
 var target = 21;
 

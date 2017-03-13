@@ -1,4 +1,5 @@
 const https = require('https');
+const http = require('http');
 const fs = require('fs');
 const path = require("path");
 const express = require('express');
@@ -80,4 +81,13 @@ https.createServer(cred, app).listen(app.get("portssl"), function(err) {
     else console.log("listening on port " + app.get("portssl"));
 });
 
-//TODO http redirect to https
+// http redirect to https
+
+var http = express.createServer();
+
+// set up a route to redirect http to https
+http.get('*', function(req, res) {
+    res.redirect('https://k.soon.it' + req.url)
+})
+
+http.listen(app.get("port"));
