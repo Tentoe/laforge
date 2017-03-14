@@ -82,4 +82,3 @@ function passwordValid(pass) {
 
 
 module.exports = router;
-router;

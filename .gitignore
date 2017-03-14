@@ -44,3 +44,7 @@ jspm_packages
 
 # password file
 passwords.md5
+
+# credentials for google api
+client_secret.json
+client_id.json

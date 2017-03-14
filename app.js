@@ -1,5 +1,4 @@
 const https = require('https');
-const http = require('http');
 const fs = require('fs');
 const path = require("path");
 const express = require('express');
@@ -49,6 +48,7 @@ app.set('view engine', 'handlebars');
 
 //routes
 app.use('/', require("./routes/home"));
+app.use('/google', require("./routes/googleCalendar"));
 
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -78,16 +78,19 @@ app.use(function(err, req, res, next) {
 
 https.createServer(cred, app).listen(app.get("portssl"), function(err) {
     if (err) console.error(err);
-    else console.log("listening on port " + app.get("portssl"));
+    else console.log("https listening on port " + app.get("portssl"));
 });
 
-// http redirect to https
+// http redirect to http
 
-var http = express.createServer();
-
-// set up a route to redirect http to https
-http.get('*', function(req, res) {
-    res.redirect('https://k.soon.it' + req.url)
-})
-
-http.listen(app.get("port"));
+// Redirect from http port 80 to https
+const http = require('http');
+http.createServer(function(req, res) {
+    res.writeHead(301, {
+        "Location": "https://" + req.headers['host'] + req.url
+    });
+    res.end();
+}).listen(app.get("port"), function(err) {
+    if (err) console.error(err);
+    else console.log("http listening on port " + app.get("port"));
+});

@@ -29,6 +29,8 @@
     "express": "^4.15.0",
     "express-handlebars": "^3.0.0",
     "express-session": "^1.15.1",
+    "google-auth-library": "^0.10.0",
+    "googleapis": "^18.0.0",
     "mongodb": "^2.2.24",
     "onoff": "^1.1.2"
   },
