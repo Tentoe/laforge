@@ -30,9 +30,7 @@ router.get('/', function(req, res) {
 });
 
 router.post('/', function(req, res) {
-    console.log("post");
     if (req.body.password) {
-
         req.body.password = md5hash(req.body.password);
         req.session.loggedIn = passwordValid(req.body.password);
     }

@@ -67,7 +67,8 @@ app.use(function(err, req, res, next) {
 
     // render the error page
     var vars = {
-        loggedIn: req.session.loggedIn || false
+        loggedIn: req.session.loggedIn || false,
+        message: err.message
     };
     res.status(err.status || 500);
     if (err.status === 404) res.render('404', vars);

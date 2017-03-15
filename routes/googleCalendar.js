@@ -37,6 +37,7 @@ fs.readFile(path.join(process.cwd(), 'client_secret.json'),
  * @param {function} callback The callback to call with the authorized client.
  */
 function authorize(credentials, callback) {
+
     var clientSecret = credentials.web.client_secret;
     var clientId = credentials.web.client_id;
     var redirectUrl = credentials.web.redirect_uris[0];
@@ -46,7 +47,8 @@ function authorize(credentials, callback) {
     // Check if we have previously stored a token.
     fs.readFile(TOKEN_PATH, function(err, token) {
         if (err) {
-            getNewToken(oauth2Client, callback);
+            //getNewToken(oauth2Client, callback);
+            callback(new Error("no token found"), oauth2Client);
         } else {
             oauth2Client.credentials = JSON.parse(token);
             callback(null, oauth2Client);
@@ -54,37 +56,6 @@ function authorize(credentials, callback) {
     });
 }
 
-/**
- * Get and store new token after prompting for user authorization, and then
- * execute the given callback with the authorized OAuth2 client.
- *
- * @param {google.auth.OAuth2} oauth2Client The OAuth2 client to get token for.
- * @param {getEventsCallback} callback The callback to call with the authorized
- *     client.
- */
-function getNewToken(oauth2Client, callback) {
-    var authUrl = oauth2Client.generateAuthUrl({
-        access_type: 'offline',
-        scope: SCOPES
-    });
-    console.log('Authorize this app by visiting this url: ', authUrl);
-    var rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout
-    });
-    rl.question('Enter the code from that page here: ', function(code) {
-        rl.close();
-        oauth2Client.getToken(code, function(err, token) {
-            if (err) {
-                console.log('Error while trying to retrieve access token', err);
-                return;
-            }
-            oauth2Client.credentials = token;
-            storeToken(token);
-            callback(oauth2Client);
-        });
-    });
-};
 
 /**
  * Store token to disk be used in later program executions.
@@ -100,17 +71,70 @@ function storeToken(token) {
         }
     }
     fs.writeFile(TOKEN_PATH, JSON.stringify(token));
-    console.log('Token stored to ' + TOKEN_PATH);
+    console.log('Token stored to ' + TOKEN_PATH); //TODO to callback
 }
 
 
 
 router.get('/', function(req, res) {
-    console.log();
     req.session.loggedIn = req.session.loggedIn || false;
 
-    res.render("googleCalendar", {
-        loggedIn: req.session.loggedIn
+
+
+    authorize(credentials, function(err, oauth2Client) {
+        console.log(oauth2Client);
+
+        if (req.query.code) {
+            oauth2Client.getToken(req.query.code, function(err, token) {
+                if (err) {
+                    console.log('Error while trying to retrieve access token', err);
+                    return;
+                }
+                oauth2Client.credentials = token;
+                storeToken(token);
+            });
+        };
+
+        var message = "";
+        var authUrl = oauth2Client.generateAuthUrl({
+            access_type: 'offline',
+            scope: SCOPES
+        });
+        if (err) {
+            res.render("googleCalendar", {
+                loggedIn: req.session.loggedIn,
+                message: err.message,
+                authUrl: authUrl
+            });
+        } else {
+            var calendar = google.calendar('v3');
+            calendar.calendarList.list({
+                auth: oauth2Client
+            }, function(err, response) {
+                if (err) {
+                    res.render("googleCalendar", {
+                        loggedIn: req.session.loggedIn,
+                        message: err.message,
+                        authUrl: authUrl
+                    });
+                    return;
+                }
+                hasHeatingCalendar = false;
+                if (response) response.items.forEach(function(val) { //TODO use SOME function
+                    if (val.summary.toUpperCase() === "HEATING") hasHeatingCalendar = true;
+                });
+                message = hasHeatingCalendar.toString();
+                res.render("googleCalendar", {
+                    loggedIn: req.session.loggedIn,
+                    message: message,
+                    authUrl: authUrl
+                });
+            });
+
+        }
+
+
+
     });
 
 

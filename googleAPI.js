@@ -101,7 +101,17 @@ function storeToken(token) {
  * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
  */
 function listEvents(auth) {
+    console.log("auth");
+    console.log(auth);
     var calendar = google.calendar('v3');
+
+    calendar.calendarList.list({
+        auth: auth
+    }, function(err, response) {
+        console.log(err);
+        console.log(response);
+
+    });
 
 
     calendar.events.list({
@@ -127,4 +137,5 @@ function listEvents(auth) {
             }
         }
     });
+
 }
