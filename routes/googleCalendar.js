@@ -31,6 +31,14 @@ fs.readFile(path.join(process.cwd(), 'client_secret.json'),
       credentials = JSON.parse(content);
     });
 
+
+function getOauth2Client(creds) {
+  const clientSecret = creds.web.client_secret;
+  const clientId = creds.web.client_id;
+  const redirectUrl = creds.web.redirect_uris[0];
+  const auth = new googleAuth(); // eslint-disable-line new-cap
+  return new auth.OAuth2(clientId, clientSecret, redirectUrl);
+}
 /**
  * Create an OAuth2 client with the given credentials, and then execute the
  * given callback function.
@@ -38,14 +46,8 @@ fs.readFile(path.join(process.cwd(), 'client_secret.json'),
  * @param {Object} credentials The authorization client credentials.
  * @param {function} callback The callback to call with the authorized client.
  */
-function authorize(creds) {
-  const clientSecret = creds.web.client_secret;
-  const clientId = creds.web.client_id;
-  const redirectUrl = creds.web.redirect_uris[0];
-  const auth = new googleAuth(); // eslint-disable-line new-cap
-  const oauth2Client = new auth.OAuth2(clientId, clientSecret, redirectUrl);
-
-
+function authorizeFromFile(creds) {
+  const oauth2Client = getOauth2Client(creds);
   return new Promise((resolve, reject) => {
     fs.readFile(TOKEN_PATH, (err, token) => {
       if (err) {
@@ -82,56 +84,63 @@ router.get('/', (req, res) => {
   const session = req.session;
   session.loggedIn = req.session.loggedIn || false;
 
+    // TODO new Token put somewhere else
+  if (req.query.code) {
+    const oauth2Client = getOauth2Client(credentials);
+    const authUrl = oauth2Client.generateAuthUrl(URLPARAMS);
+    oauth2Client.getToken(req.query.code, (err, token) => {
+      if (err) {
+        console.log('Error while trying to retrieve access token', err); // eslint-disable-line no-console
+        return;
+      }
+      oauth2Client.credentials = token; // eslint-disable-line no-param-reassign
+      storeToken(token);
+      res.render('googleCalendar', {
+        loggedIn: req.session.loggedIn,
+        message: 'new Token stored',
+        authUrl,
+      });
+    });
+  } else {
+    authorizeFromFile(credentials)
+            .then((oauth2Client) => {
+              console.log(oauth2Client); // eslint-disable-line no-console
+              const authUrl = oauth2Client.generateAuthUrl(URLPARAMS);
 
-  authorize(credentials)
-        .then((oauth2Client) => {
-          console.log(oauth2Client); // eslint-disable-line no-console
-          const authUrl = oauth2Client.generateAuthUrl(URLPARAMS);
-            // TODO new Token put somewhere else
-          if (req.query.code) {
-            oauth2Client.getToken(req.query.code, (err, token) => {
-              if (err) {
-                console.log('Error while trying to retrieve access token', err); // eslint-disable-line no-console
-                return;
-              }
-              oauth2Client.credentials = token; // eslint-disable-line no-param-reassign
-              storeToken(token);
-            });
-          }
 
-
-          const calendar = google.calendar('v3');
-          calendar.calendarList.list({
-            auth: oauth2Client,
-          }, (err, response) => {
-            if (err) {
+              const calendar = google.calendar('v3');
+              calendar.calendarList.list({
+                auth: oauth2Client,
+              }, (err, response) => {
+                if (err) {
+                  res.render('googleCalendar', {
+                    loggedIn: req.session.loggedIn,
+                    message: 'error with request',
+                    authUrl,
+                  });
+                  return;
+                }
+                let hasHeatingCalendar = false;
+                if (response) {
+                  response.items.forEach((val) => { // TODO use SOME function
+                    if (val.summary.toUpperCase() === 'HEATING') hasHeatingCalendar = true;
+                  });
+                }
+                res.render('googleCalendar', {
+                  loggedIn: req.session.loggedIn,
+                  message: hasHeatingCalendar.toString(),
+                  authUrl,
+                });
+              });
+            }, (err, oauth2Client) => { // errors from authorize
+              const authUrl = oauth2Client.generateAuthUrl(URLPARAMS);
               res.render('googleCalendar', {
                 loggedIn: req.session.loggedIn,
-                message: 'error with request',
+                message: err.message,
                 authUrl,
               });
-              return;
-            }
-            let hasHeatingCalendar = false;
-            if (response) {
-              response.items.forEach((val) => { // TODO use SOME function
-                if (val.summary.toUpperCase() === 'HEATING') hasHeatingCalendar = true;
-              });
-            }
-            res.render('googleCalendar', {
-              loggedIn: req.session.loggedIn,
-              message: hasHeatingCalendar.toString(),
-              authUrl,
             });
-          });
-        }, (err, oauth2Client) => { // errors from authorize
-          const authUrl = oauth2Client.generateAuthUrl(URLPARAMS);
-          res.render('googleCalendar', {
-            loggedIn: req.session.loggedIn,
-            message: err.message,
-            authUrl,
-          });
-        });
+  }
 });
 
 
