@@ -17,12 +17,15 @@ let credentials = null;
 const SCOPES = ['https://www.googleapis.com/auth/calendar.readonly'];
 const TOKEN_DIR = path.join(process.cwd(), `credentials${path.sep}`);
 const TOKEN_PATH = `${TOKEN_DIR}calendar-nodejs.json`;
-
+const URLPARAMS = {
+  access_type: 'offline',
+  scope: SCOPES,
+};
 // Load client secrets from a local file.
 fs.readFile(path.join(process.cwd(), 'client_secret.json'),
     (err, content) => {
       if (err) { // TODO error handling
-        console.log(`Error loading client secret file: ${err}`);// eslint-disable-line no-console
+        console.log(`Error loading client secret file: ${err}`); // eslint-disable-line no-console
         return;
       }
       credentials = JSON.parse(content);
@@ -35,22 +38,24 @@ fs.readFile(path.join(process.cwd(), 'client_secret.json'),
  * @param {Object} credentials The authorization client credentials.
  * @param {function} callback The callback to call with the authorized client.
  */
-function authorize(creds, callback) {
+function authorize(creds) {
   const clientSecret = creds.web.client_secret;
   const clientId = creds.web.client_id;
   const redirectUrl = creds.web.redirect_uris[0];
   const auth = new googleAuth(); // eslint-disable-line new-cap
   const oauth2Client = new auth.OAuth2(clientId, clientSecret, redirectUrl);
 
-    // Check if we have previously stored a token.
-  fs.readFile(TOKEN_PATH, (err, token) => {
-    if (err) {
-            // getNewToken(oauth2Client, callback);
-      callback(new Error('no token found'), oauth2Client);
-    } else {
-      oauth2Client.credentials = JSON.parse(token);
-      callback(null, oauth2Client);
-    }
+
+  return new Promise((resolve, reject) => {
+    fs.readFile(TOKEN_PATH, (err, token) => {
+      if (err) {
+                // getNewToken(oauth2Client, callback);
+        reject(new Error('no token found'), oauth2Client);
+      } else {
+        oauth2Client.credentials = JSON.parse(token);
+        resolve(oauth2Client);
+      }
+    });
   });
 }
 
@@ -70,7 +75,7 @@ function storeToken(token) {
   }
   fs.writeFile(TOKEN_PATH, JSON.stringify(token));
   console.log(`Token stored to ${TOKEN_PATH}`); // eslint-disable-line no-console
-}// TODO to callback
+} // TODO to callback
 
 
 router.get('/', (req, res) => {
@@ -78,59 +83,55 @@ router.get('/', (req, res) => {
   session.loggedIn = req.session.loggedIn || false;
 
 
-  authorize(credentials, (err, oauth2Client) => {
-    console.log(oauth2Client);// eslint-disable-line no-console
+  authorize(credentials)
+        .then((oauth2Client) => {
+          console.log(oauth2Client); // eslint-disable-line no-console
+          const authUrl = oauth2Client.generateAuthUrl(URLPARAMS);
+            // TODO new Token put somewhere else
+          if (req.query.code) {
+            oauth2Client.getToken(req.query.code, (err, token) => {
+              if (err) {
+                console.log('Error while trying to retrieve access token', err); // eslint-disable-line no-console
+                return;
+              }
+              oauth2Client.credentials = token; // eslint-disable-line no-param-reassign
+              storeToken(token);
+            });
+          }
 
-    if (req.query.code) {
-      oauth2Client.getToken(req.query.code, (err2, token) => {
-        if (err2) {
-          console.log('Error while trying to retrieve access token', err2);// eslint-disable-line no-console
-          return;
-        }
-        oauth2Client.credentials = token;// eslint-disable-line no-param-reassign
-        storeToken(token);
-      });
-    }
 
-    let message = '';
-    const authUrl = oauth2Client.generateAuthUrl({
-      access_type: 'offline',
-      scope: SCOPES,
-    });
-    if (err) {
-      res.render('googleCalendar', {
-        loggedIn: req.session.loggedIn,
-        message: err.message,
-        authUrl,
-      });
-    } else {
-      const calendar = google.calendar('v3');
-      calendar.calendarList.list({
-        auth: oauth2Client,
-      }, (err2, response) => {
-        if (err2) {
+          const calendar = google.calendar('v3');
+          calendar.calendarList.list({
+            auth: oauth2Client,
+          }, (err, response) => {
+            if (err) {
+              res.render('googleCalendar', {
+                loggedIn: req.session.loggedIn,
+                message: 'error with request',
+                authUrl,
+              });
+              return;
+            }
+            let hasHeatingCalendar = false;
+            if (response) {
+              response.items.forEach((val) => { // TODO use SOME function
+                if (val.summary.toUpperCase() === 'HEATING') hasHeatingCalendar = true;
+              });
+            }
+            res.render('googleCalendar', {
+              loggedIn: req.session.loggedIn,
+              message: hasHeatingCalendar.toString(),
+              authUrl,
+            });
+          });
+        }, (err, oauth2Client) => { // errors from authorize
+          const authUrl = oauth2Client.generateAuthUrl(URLPARAMS);
           res.render('googleCalendar', {
             loggedIn: req.session.loggedIn,
             message: err.message,
             authUrl,
           });
-          return;
-        }
-        let hasHeatingCalendar = false;
-        if (response) {
-          response.items.forEach((val) => { // TODO use SOME function
-            if (val.summary.toUpperCase() === 'HEATING') hasHeatingCalendar = true;
-          });
-        }
-        message = hasHeatingCalendar.toString();
-        res.render('googleCalendar', {
-          loggedIn: req.session.loggedIn,
-          message,
-          authUrl,
         });
-      });
-    }
-  });
 });
 
 
