@@ -13,7 +13,8 @@ router.post('/', home.post);
 
 
 router.get('/logout', (req, res) => {
-  req.session.loggedIn = false;
+  const session = req.session;
+  session.loggedIn = false;
 
   res.render('logout');
 });

@@ -1,9 +1,9 @@
 // TODO split logic from the router
 
 const express = require('express');
-const piheat = require('../piheat');
+// const piheat = require('../piheat');
 const fs = require('fs');
-const readline = require('readline');
+// const readline = require('readline');
 const google = require('googleapis');
 const googleAuth = require('google-auth-library');
 const path = require('path');
@@ -22,7 +22,7 @@ const TOKEN_PATH = `${TOKEN_DIR}calendar-nodejs.json`;
 fs.readFile(path.join(process.cwd(), 'client_secret.json'),
     (err, content) => {
       if (err) { // TODO error handling
-        console.log(`Error loading client secret file: ${err}`);
+        console.log(`Error loading client secret file: ${err}`);// eslint-disable-line no-console
         return;
       }
       credentials = JSON.parse(content);
@@ -35,11 +35,11 @@ fs.readFile(path.join(process.cwd(), 'client_secret.json'),
  * @param {Object} credentials The authorization client credentials.
  * @param {function} callback The callback to call with the authorized client.
  */
-function authorize(credentials, callback) {
-  const clientSecret = credentials.web.client_secret;
-  const clientId = credentials.web.client_id;
-  const redirectUrl = credentials.web.redirect_uris[0];
-  const auth = new googleAuth();
+function authorize(creds, callback) {
+  const clientSecret = creds.web.client_secret;
+  const clientId = creds.web.client_id;
+  const redirectUrl = creds.web.redirect_uris[0];
+  const auth = new googleAuth(); // eslint-disable-line new-cap
   const oauth2Client = new auth.OAuth2(clientId, clientSecret, redirectUrl);
 
     // Check if we have previously stored a token.
@@ -64,29 +64,30 @@ function storeToken(token) {
   try {
     fs.mkdirSync(TOKEN_DIR);
   } catch (err) {
-    if (err.code != 'EEXIST') {
+    if (err.code !== 'EEXIST') {
       throw err;
     }
   }
   fs.writeFile(TOKEN_PATH, JSON.stringify(token));
-  console.log(`Token stored to ${TOKEN_PATH}`); // TODO to callback
-}
+  console.log(`Token stored to ${TOKEN_PATH}`); // eslint-disable-line no-console
+}// TODO to callback
 
 
 router.get('/', (req, res) => {
-  req.session.loggedIn = req.session.loggedIn || false;
+  const session = req.session;
+  session.loggedIn = req.session.loggedIn || false;
 
 
   authorize(credentials, (err, oauth2Client) => {
-    console.log(oauth2Client);
+    console.log(oauth2Client);// eslint-disable-line no-console
 
     if (req.query.code) {
-      oauth2Client.getToken(req.query.code, (err, token) => {
-        if (err) {
-          console.log('Error while trying to retrieve access token', err);
+      oauth2Client.getToken(req.query.code, (err2, token) => {
+        if (err2) {
+          console.log('Error while trying to retrieve access token', err2);// eslint-disable-line no-console
           return;
         }
-        oauth2Client.credentials = token;
+        oauth2Client.credentials = token;// eslint-disable-line no-param-reassign
         storeToken(token);
       });
     }
@@ -106,8 +107,8 @@ router.get('/', (req, res) => {
       const calendar = google.calendar('v3');
       calendar.calendarList.list({
         auth: oauth2Client,
-      }, (err, response) => {
-        if (err) {
+      }, (err2, response) => {
+        if (err2) {
           res.render('googleCalendar', {
             loggedIn: req.session.loggedIn,
             message: err.message,
@@ -115,7 +116,7 @@ router.get('/', (req, res) => {
           });
           return;
         }
-        hasHeatingCalendar = false;
+        let hasHeatingCalendar = false;
         if (response) {
           response.items.forEach((val) => { // TODO use SOME function
             if (val.summary.toUpperCase() === 'HEATING') hasHeatingCalendar = true;

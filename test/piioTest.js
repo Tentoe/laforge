@@ -1,4 +1,5 @@
-const piio = require('../piio');
+/* eslint-env node, mocha */
+const piio = require('../routes/lib/piio');
 const assert = require('assert');
 
 describe('piio', () => {

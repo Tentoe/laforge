@@ -3,6 +3,7 @@ const fs = require('fs');
 const tempSensor = '/sys/bus/w1/devices/28-80000026cc60/w1_slave';
 
 const Gpio = require('onoff').Gpio;
+
 const radiator = new Gpio(18, 'low');
 
 function readSensor(resolve, reject) {

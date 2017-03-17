@@ -5,6 +5,7 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const express = require('express');
+
 const app = express();
 const handlebars = require('express-handlebars').create({
   defaultLayout: 'main',
@@ -54,19 +55,21 @@ app.use('/', require('./routes/routes'));
 
 
 https.createServer(cred, app).listen(app.get('portssl'), (err) => {
-  if (err) console.error(err);
-  else console.log(`https listening on port ${app.get('portssl')}`);
+  if (err) console.error(err);// eslint-disable-line no-console
+  else console.log(`https listening on port ${app.get('portssl')}`);// eslint-disable-line no-console
 });
 
 
 // Redirect from http to https
 const http = require('http');
+
 http.createServer((req, res) => {
   res.writeHead(301, {
     Location: `https://${req.headers.host}${req.url}`,
   });
   res.end();
 }).listen(app.get('port'), (err) => {
-  if (err) console.error(err);
-  else console.log(`http listening on port ${app.get('port')}`);
+  if (err) console.error(err); // eslint-disable-line no-console
+  else console.log(`http listening on port ${app.get('port')}`);// eslint-disable-line no-console
 });
+// TODO implement proper logger

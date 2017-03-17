@@ -25,16 +25,19 @@ function passwordValid(pass) { // TODO assync
 
 module.exports = {
   get(req, res) {
-    req.session.loggedIn = req.session.loggedIn || false;
+    const session = req.session;
+    session.loggedIn = req.session.loggedIn || false;
 
-    getVars(req.session).then((val) => {
+    getVars(session).then((val) => {
       res.render('home', val);
     }); // TODO Catch
   },
   post(req, res) {
     if (req.body.password) {
-      req.body.password = md5hash(req.body.password);
-      req.session.loggedIn = passwordValid(req.body.password);
+      const session = req.session;
+      const body = req.body;
+      body.password = md5hash(req.body.password);
+      session.loggedIn = passwordValid(req.body.password);
     }
 
     if (req.body.target && req.session.loggedIn) {
