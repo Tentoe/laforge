@@ -9,7 +9,7 @@ const router = express.Router();
 router.get('/', home.get);
 router.post('/', home.post);
 router.get('/logout', require('./logout'));
-router.use('/google', require('./googleCalendar'));
+router.use('/google', require('./calendarConfig'));
 
 // catch 404 and forward to error handler
 router.use((req, res, next) => {

@@ -15,10 +15,9 @@ function md5hash(str) {
 }
 
 function passwordValid(pass) { // TODO assync
-  const passwords = fs.readFileSync('passwords.md5').toString().split(/\r?\n/).reduce((acc, val) =>  // eslint-disable-line no-confusing-arrow
-     val !== '' ? acc.concat(val) : acc // remove all empty strings (eof creates an empty string)
-  , []);
-
+  const passwords = fs.readFileSync('passwords.md5').toString().split(/\r?\n/).reduce((acc, val) => // eslint-disable-line no-confusing-arrow
+        val !== '' ? acc.concat(val) : acc // remove all empty strings (eof creates an empty string)
+        , []);
 
   return passwords.some(p => p === pass);
 }
@@ -27,7 +26,6 @@ module.exports = {
   get(req, res) {
     const session = req.session;
     session.loggedIn = req.session.loggedIn || false;
-
     getVars(session).then((val) => {
       res.render('home', val);
     }); // TODO Catch
