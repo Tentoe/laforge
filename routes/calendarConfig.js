@@ -27,11 +27,11 @@ router.get('/', (req, res) => {
     const oauth2Client = googleCalendar.getOAuth2Client();
     console.log(oauth2Client); // eslint-disable-line no-console
     const authUrl = googleCalendar.getAuthUrl();
-    googleCalendar.getResults()
-            .then((results) => {
+    googleCalendar.getAccount()
+            .then((acc) => {
               res.render('googleCalendar', {
                 loggedIn: req.session.loggedIn,
-                message: JSON.stringify(results),
+                message: acc,
                 authUrl,
               });
             })

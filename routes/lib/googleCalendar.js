@@ -7,7 +7,9 @@ const fs = require('fs');
 const googleApis = require('googleapis');
 const googleAuth = require('google-auth-library');
 const path = require('path');
+const piheat = require('./piheat');
 
+const calendar = googleApis.calendar('v3');
 
 let credentials = null;
 
@@ -50,6 +52,7 @@ fs.readFile(TOKEN_PATH, (err, token) => {
     console.log('could not load Token form File'); // eslint-disable-line no-console
   } else {
     oauth2Client.credentials = JSON.parse(token);
+    piheat.refreshCalendar(); // TODO find better place
   }
 });
 
@@ -72,6 +75,20 @@ function storeToken(token) {
 } // TODO to callback
 
 
+function getCalendarId() {
+  return new Promise((resolve, reject) => {
+    calendar.calendarList.list({
+      auth: oauth2Client,
+    }, (err, response) => {
+      if (err) reject(err);
+      const ret = response.items.find(val => val.summary.toUpperCase() === 'HEATING');
+
+      resolve(ret.id);
+    });
+  });
+}
+
+
 module.exports = {
   getAuthUrl() {
     return oauth2Client.generateAuthUrl(URLPARAMS);
@@ -91,14 +108,29 @@ module.exports = {
     });
   },
   getResults() {
-    const calendar = googleApis.calendar('v3');
-    return new Promise((resolve, reject) => {
-      calendar.calendarList.list({
+    return getCalendarId().then(id => new Promise((resolve, reject) => {
+      calendar.events.list({
         auth: oauth2Client,
+        calendarId: id,
+        timeMin: (new Date()).toISOString(),
+        maxResults: 10,
+        singleEvents: true,
       }, (err, response) => {
         if (err) reject(err);
-        resolve(response);
+        resolve(response.items);
+      });
+    }));
+  },
+  getAccount() {
+    return new Promise((resolve, reject) => {
+      calendar.calendars.get({
+        auth: oauth2Client,
+        calendarId: 'primary',
+      }, (err, response) => {
+        if (err) reject(err);
+        resolve(response.id);
       });
     });
   },
+
 };

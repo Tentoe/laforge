@@ -1,5 +1,8 @@
 const piio = require('./piioDUMMY');
+const googleCalendar = require('./googleCalendar');
+const schedule = require('node-schedule');
 
+const nightTarget = 17;
 let target = 21;
 
 let on = false; // TODO read back value
@@ -9,7 +12,7 @@ const cycleDurationMargin = 1000 * 60 * 5; // 5 min
 const targetTolerance = 0.5; // in °C
 
 let lastTemp = target;
-
+const jobs = [];
 
 const state = {
   value: 0.5,
@@ -87,6 +90,11 @@ function cycleControl() {
   });
 }
 
+function cancelAllJobs() {
+  while (jobs.length > 0) {
+    jobs.pop().cancel();
+  }
+}
 
 module.exports = {
   getTemp() {
@@ -100,6 +108,19 @@ module.exports = {
     state.value = 0.5; // TODO set dynamically
     clearTimeout(cycleTimeout);
     setImmediate(cycleControl);
+  },
+  refreshCalendar() {
+    cancelAllJobs();
+    googleCalendar.getResults().then((results) => {
+      results.forEach((val) => {
+        jobs.push(schedule.scheduleJob(Date.parse(val.start.dateTime), () => {
+          module.exports.setNewTarget(parseFloat(val.summary)); // Day
+        }));
+        jobs.push(schedule.scheduleJob(Date.parse(val.end.dateTime), () => {
+          module.exports.setNewTarget(nightTarget); // Night
+        }));
+      });
+    });
   },
 };
 
