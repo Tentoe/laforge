@@ -88,7 +88,8 @@ function cycleControl() {
 
 function cancelAllJobs() {
   while (jobs.length > 0) {
-    jobs.pop().cancel();
+    const job = jobs.pop();
+    if (job) job.cancel();
   }
 }
 
