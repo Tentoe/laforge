@@ -45,7 +45,40 @@ fs.readFile(path.join(process.cwd(), 'client_secret.json'),
       oauth2Client = getOauth2Client(credentials);
     });
 
+function getCalendarId() {
+  return new Promise((resolve, reject) => {
+    calendar.calendarList.list({
+      auth: oauth2Client,
+    }, (err, response) => {
+      if (err) reject(err);
+      const ret = response.items.find(val => val.summary.toUpperCase() === 'HEATING');
 
+      resolve(ret.id);
+    });
+  });
+}
+
+function getResults() {
+  return getCalendarId().then(id => new Promise((resolve, reject) => {
+    calendar.events.list({
+      auth: oauth2Client,
+      calendarId: id,
+      timeMin: (new Date()).toISOString(),
+      maxResults: 10,
+      singleEvents: true,
+      orderBy: 'startTime',
+    }, (err, response) => {
+      if (err) reject(err);
+      resolve(response.items);
+    });
+  }));
+}
+
+function updateCalendar() {
+  getResults().then((results) => {
+    piheat.refreshCalendar(results);
+  });
+}
 /**
  * Store token to disk be used in later program executions.
  *
@@ -61,21 +94,8 @@ function storeToken(token) {
   }
   fs.writeFile(TOKEN_PATH, JSON.stringify(token));
   console.log(`Token stored to ${TOKEN_PATH}`); // eslint-disable-line no-console
+  updateCalendar();
 } // TODO to callback
-
-
-function getCalendarId() {
-  return new Promise((resolve, reject) => {
-    calendar.calendarList.list({
-      auth: oauth2Client,
-    }, (err, response) => {
-      if (err) reject(err);
-      const ret = response.items.find(val => val.summary.toUpperCase() === 'HEATING');
-
-      resolve(ret.id);
-    });
-  });
-}
 
 
 module.exports = {
@@ -96,20 +116,6 @@ module.exports = {
       });
     });
   },
-  getResults() {
-    return getCalendarId().then(id => new Promise((resolve, reject) => {
-      calendar.events.list({
-        auth: oauth2Client,
-        calendarId: id,
-        timeMin: (new Date()).toISOString(),
-        maxResults: 10,
-        singleEvents: true,
-      }, (err, response) => {
-        if (err) reject(err);
-        resolve(response.items);
-      });
-    }));
-  },
   getAccount() {
     return new Promise((resolve, reject) => {
       calendar.calendars.get({
@@ -124,11 +130,6 @@ module.exports = {
 
 };
 
-function updateCalendar() {
-  module.exports.getResults().then((results) => { // TODO remove results from exports
-    piheat.refreshCalendar(results);
-  });
-}
 
 // get Token from File
 
@@ -141,6 +142,6 @@ fs.readFile(TOKEN_PATH, (err, token) => {
     schedule.scheduleJob({
       minute: 0,
     }, updateCalendar);
-                    // TODO implement watching for changes
+        // TODO implement watching for changes
   }
 });

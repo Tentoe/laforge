@@ -38,9 +38,6 @@ function fixMinMax(value) {
 }
 
 function cycleControl() {
-    // TODO implement heating hours
-
-
   piio.getCelsius().then((data) => {
     const targetDiv = data - target;
 
@@ -111,10 +108,18 @@ module.exports = {
   refreshCalendar(newJobs) {
     cancelAllJobs();
     newJobs.forEach((val) => {
-      jobs.push(schedule.scheduleJob(Date.parse(val.start.dateTime), () => {
+      const start = Date.parse(val.start.dateTime);
+      const end = Date.parse(val.end.dateTime);
+      const now = new Date();
+            // do we have to heat now?
+      if ((start.valueOf() < now.valueOf()) && (end.valueOf() > now.valueOf())) {
+        module.exports.setNewTarget(parseFloat(val.summary));
+      }
+
+      jobs.push(schedule.scheduleJob(start, () => {
         module.exports.setNewTarget(parseFloat(val.summary)); // Day
       }));
-      jobs.push(schedule.scheduleJob(Date.parse(val.end.dateTime), () => {
+      jobs.push(schedule.scheduleJob(end, () => {
         module.exports.setNewTarget(nightTarget); // Night
       }));
     });
