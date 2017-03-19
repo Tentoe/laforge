@@ -45,18 +45,6 @@ fs.readFile(path.join(process.cwd(), 'client_secret.json'),
     });
 
 
-// get Token from File
-
-fs.readFile(TOKEN_PATH, (err, token) => {
-  if (err) {
-    console.log('could not load Token form File'); // eslint-disable-line no-console
-  } else {
-    oauth2Client.credentials = JSON.parse(token);
-    piheat.refreshCalendar(); // TODO find better place
-  }
-});
-
-
 /**
  * Store token to disk be used in later program executions.
  *
@@ -134,3 +122,18 @@ module.exports = {
   },
 
 };
+
+
+// get Token from File
+
+fs.readFile(TOKEN_PATH, (err, token) => {
+  if (err) {
+    console.log('could not load Token form File'); // eslint-disable-line no-console
+  } else {
+    oauth2Client.credentials = JSON.parse(token);
+    module.exports.getResults().then((results) => { // TODO remove results from exports
+      piheat.refreshCalendar(results);
+    });
+        // TODO find better place
+  }
+});

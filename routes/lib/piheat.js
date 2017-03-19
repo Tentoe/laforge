@@ -1,5 +1,4 @@
 const piio = require('./piioDUMMY');
-const googleCalendar = require('./googleCalendar');
 const schedule = require('node-schedule');
 
 const nightTarget = 17;
@@ -109,17 +108,15 @@ module.exports = {
     clearTimeout(cycleTimeout);
     setImmediate(cycleControl);
   },
-  refreshCalendar() {
+  refreshCalendar(newJobs) {
     cancelAllJobs();
-    googleCalendar.getResults().then((results) => {
-      results.forEach((val) => {
-        jobs.push(schedule.scheduleJob(Date.parse(val.start.dateTime), () => {
-          module.exports.setNewTarget(parseFloat(val.summary)); // Day
-        }));
-        jobs.push(schedule.scheduleJob(Date.parse(val.end.dateTime), () => {
-          module.exports.setNewTarget(nightTarget); // Night
-        }));
-      });
+    newJobs.forEach((val) => {
+      jobs.push(schedule.scheduleJob(Date.parse(val.start.dateTime), () => {
+        module.exports.setNewTarget(parseFloat(val.summary)); // Day
+      }));
+      jobs.push(schedule.scheduleJob(Date.parse(val.end.dateTime), () => {
+        module.exports.setNewTarget(nightTarget); // Night
+      }));
     });
   },
 };
