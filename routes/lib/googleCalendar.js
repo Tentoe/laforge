@@ -7,6 +7,7 @@ const fs = require('fs');
 const googleApis = require('googleapis');
 const googleAuth = require('google-auth-library');
 const path = require('path');
+const schedule = require('node-schedule');
 const piheat = require('./piheat');
 
 const calendar = googleApis.calendar('v3');
@@ -123,6 +124,11 @@ module.exports = {
 
 };
 
+function updateCalendar() {
+  module.exports.getResults().then((results) => { // TODO remove results from exports
+    piheat.refreshCalendar(results);
+  });
+}
 
 // get Token from File
 
@@ -131,9 +137,10 @@ fs.readFile(TOKEN_PATH, (err, token) => {
     console.log('could not load Token form File'); // eslint-disable-line no-console
   } else {
     oauth2Client.credentials = JSON.parse(token);
-    module.exports.getResults().then((results) => { // TODO remove results from exports
-      piheat.refreshCalendar(results);
-    });
-        // TODO find better place
+    updateCalendar();
+    schedule.scheduleJob({
+      minute: 0,
+    }, updateCalendar);
+                    // TODO implement watching for changes
   }
 });
