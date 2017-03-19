@@ -1,5 +1,6 @@
 const piio = require('./piioDUMMY');
 const schedule = require('node-schedule');
+const logTemperature = require('./logTemperature');
 
 const nightTarget = 17;
 let target = 21;
@@ -112,6 +113,7 @@ module.exports = {
       const start = Date.parse(val.start.dateTime);
       const end = Date.parse(val.end.dateTime);
       const now = new Date();
+
             // do we have to heat now?
       if ((start.valueOf() < now.valueOf()) && (end.valueOf() > now.valueOf())) {
         module.exports.setNewTarget(parseFloat(val.summary));
@@ -129,3 +131,11 @@ module.exports = {
 
 
 setImmediate(cycleControl);
+
+function logger() {
+  piio.getCelsius().then((temp) => {
+    logTemperature.log(temp); // TODO error hanlding
+  });
+}
+// every 10 minutes
+schedule.scheduleJob('*/10 * * * *', logger);
