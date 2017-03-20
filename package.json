@@ -26,6 +26,7 @@
   "dependencies": {
     "app-module-path": "^2.2.0",
     "body-parser": "^1.17.0",
+    "chart.js": "^2.5.0",
     "cookie-parser": "^1.4.3",
     "express": "^4.15.0",
     "express-handlebars": "^3.0.0",

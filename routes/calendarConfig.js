@@ -9,7 +9,7 @@ router.get('/', (req, res) => {
   session.loggedIn = session.loggedIn || false;
 
 
-  if (req.query.code) { // store new Token
+  if (req.query.code) { // store new Token TODO filter token with no refresh Token
     googleCalendar.storeNewToken(req.query.code).then(() => {
       res.render('googleCalendar', {
         loggedIn: req.session.loggedIn,
