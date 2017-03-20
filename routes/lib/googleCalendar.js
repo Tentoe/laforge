@@ -51,9 +51,8 @@ function getCalendarId() {
       auth: oauth2Client,
     }, (err, response) => {
       if (err) reject(err);
-      const ret = response.items.find(val => val.summary.toUpperCase() === 'HEATING');
-
-      resolve(ret.id);
+      if (response) resolve(response.items.find(val => val.summary.toUpperCase() === 'HEATING').id);
+      reject(new Error('strange error happend again'));
     });
   });
 }
