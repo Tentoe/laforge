@@ -14,22 +14,25 @@ function readSensor(resolve, reject) {
 }
 
 
-module.exports = {
-  getCelsius() {
-    return new Promise(readSensor)
-            .then(() =>  // we dont need the data from the first read
-               new Promise(readSensor))
-            .then((data) => {
-              const lines = data.split('\n');
-              return parseFloat(lines[1].split('t=')[1]) / 1000.0;
-            });
-  },
-  setHeating(on) {
-    return new Promise((resolve, reject) => {
-      radiator.write(on ? 1 : 0, (err) => {
-        if (err) reject(err);
-        else resolve(on);
-      });
+function getCelsius() {
+  return new Promise(readSensor)
+        .then(() => // we dont need the data from the first read
+            new Promise(readSensor))
+        .then((data) => {
+          const lines = data.split('\n');
+          return parseFloat(lines[1].split('t=')[1]) / 1000.0;
+        });
+}
+
+function setHeating(on) {
+  return new Promise((resolve, reject) => {
+    radiator.write(on ? 1 : 0, (err) => {
+      if (err) reject(err);
+      else resolve(on);
     });
-  },
+  });
+}
+module.exports = {
+  getCelsius,
+  setHeating,
 };

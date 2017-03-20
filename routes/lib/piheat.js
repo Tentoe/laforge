@@ -1,6 +1,6 @@
 const piio = require('./piioDUMMY');
 const schedule = require('node-schedule');
-const logTemperature = require('./logTemperature');
+const database = require('./database');
 
 const nightTarget = 17;
 let target = 21;
@@ -94,47 +94,52 @@ function cancelAllJobs() {
   }
 }
 
-module.exports = {
-  getTemp() {
-    return piio.getCelsius();
-  },
-  getTarget() {
-    return target;
-  },
-  setNewTarget(t) {
-    target = t;
-    state.value = 0.5; // TODO set dynamically
-    clearTimeout(cycleTimeout);
-    setImmediate(cycleControl);
-  },
-  refreshCalendar(newJobs) {
-    cancelAllJobs();
-    newJobs.forEach((val) => {
-      const start = Date.parse(val.start.dateTime);
-      const end = Date.parse(val.end.dateTime);
-      const now = new Date();
+
+function getTemp() {
+  return piio.getCelsius();
+}
+function getTarget() {
+  return target;
+}
+function setNewTarget(t) {
+  target = t;
+  state.value = 0.5; // TODO set dynamically
+  clearTimeout(cycleTimeout);
+  setImmediate(cycleControl);
+}
+function refreshCalendar(newJobs) {
+  cancelAllJobs();
+  newJobs.forEach((val) => {
+    const start = Date.parse(val.start.dateTime);
+    const end = Date.parse(val.end.dateTime);
+    const now = new Date();
 
             // do we have to heat now?
-      if ((start.valueOf() < now.valueOf()) && (end.valueOf() > now.valueOf())) {
-        module.exports.setNewTarget(parseFloat(val.summary));
-      }
+    if ((start.valueOf() < now.valueOf()) && (end.valueOf() > now.valueOf())) {
+      module.exports.setNewTarget(parseFloat(val.summary));
+    }
 
-      jobs.push(schedule.scheduleJob(start, () => {
-        module.exports.setNewTarget(parseFloat(val.summary)); // Day
-      }));
-      jobs.push(schedule.scheduleJob(end, () => {
-        module.exports.setNewTarget(nightTarget); // Night
-      }));
-    });
-  },
+    jobs.push(schedule.scheduleJob(start, () => {
+      module.exports.setNewTarget(parseFloat(val.summary)); // Day
+    }));
+    jobs.push(schedule.scheduleJob(end, () => {
+      module.exports.setNewTarget(nightTarget); // Night
+    }));
+  });
+}
+
+
+module.exports = {
+  getTemp,
+  getTarget,
+  setNewTarget,
+  refreshCalendar,
 };
-
-
 setImmediate(cycleControl);
 
 function logger() {
   piio.getCelsius().then((temp) => {
-    logTemperature.log(temp); // TODO error hanlding
+    database.log(temp); // TODO error hanlding
   });
 }
 // every 10 minutes

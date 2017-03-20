@@ -97,37 +97,34 @@ function storeToken(token) {
 } // TODO to callback
 
 
-module.exports = {
-  getAuthUrl() {
-    return oauth2Client.generateAuthUrl(URLPARAMS);
-  },
-  getOAuth2Client() {
-    return oauth2Client;
-  },
-  storeNewToken(code) {
-    return new Promise((resolve, reject) => {
-      oauth2Client.getToken(code, (err, token) => {
-        if (err) reject(err);
+function getAuthUrl() {
+  return oauth2Client.generateAuthUrl(URLPARAMS);
+}
 
-        oauth2Client.credentials = token; // eslint-disable-line no-param-reassign
-        storeToken(token);
-        resolve();
-      });
-    });
-  },
-  getAccount() {
-    return new Promise((resolve, reject) => {
-      calendar.calendars.get({
-        auth: oauth2Client,
-        calendarId: 'primary',
-      }, (err, response) => {
-        if (err) reject(err);
-        resolve(response.id);
-      });
-    });
-  },
 
-};
+function storeNewToken(code) {
+  return new Promise((resolve, reject) => {
+    oauth2Client.getToken(code, (err, token) => {
+      if (err) reject(err);
+
+      oauth2Client.setCredentials(token); // eslint-disable-line no-param-reassign
+      storeToken(token);
+      resolve();
+    });
+  });
+}
+
+function getAccount() {
+  return new Promise((resolve, reject) => {
+    calendar.calendars.get({
+      auth: oauth2Client,
+      calendarId: 'primary',
+    }, (err, response) => {
+      if (err) reject(err);
+      resolve(response.id);
+    });
+  });
+}
 
 
 // get Token from File
@@ -136,7 +133,7 @@ fs.readFile(TOKEN_PATH, (err, token) => {
   if (err) {
     console.log('could not load Token form File'); // eslint-disable-line no-console
   } else {
-    oauth2Client.credentials = JSON.parse(token);
+    oauth2Client.setCredentials(JSON.parse(token));
     updateCalendar();
     schedule.scheduleJob({
       minute: 0,
@@ -144,3 +141,10 @@ fs.readFile(TOKEN_PATH, (err, token) => {
         // TODO implement watching for changes
   }
 });
+
+module.exports = {
+  getAuthUrl,
+  storeNewToken,
+  getAccount,
+
+};

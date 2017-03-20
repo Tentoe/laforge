@@ -24,8 +24,6 @@ router.get('/', (req, res) => {
       });
     });
   } else {
-    const oauth2Client = googleCalendar.getOAuth2Client();
-    console.log(oauth2Client); // eslint-disable-line no-console
     const authUrl = googleCalendar.getAuthUrl();
     googleCalendar.getAccount()
             .then((acc) => {
