@@ -1,8 +1,14 @@
 const database = require('./database');
 
 function getChartData(req, res) {
-  database.getTemperatures(new Date(Date.now() - (24 * 60 * 60 * 1000))) // data from last 24h
-        .then(temps => res.send(temps)).catch(() => res.end());
+    // data from last 24h
+  const temps = database.getTemperatures(new Date(Date.now() - (24 * 60 * 60 * 1000)));
+  const targets = database.getTargets(new Date(Date.now() - (24 * 60 * 60 * 1000)));
+
+  Promise.all([temps, targets])
+        .then((result) => {
+          res.send(result);
+        }).catch(() => res.end());
 }
 
 

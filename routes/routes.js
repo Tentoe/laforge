@@ -1,7 +1,6 @@
 const express = require('express');
 
 const home = require('./home');
-const database = require('./lib/database');
 const ajax = require('./lib/ajax');
 
 

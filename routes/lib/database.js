@@ -6,19 +6,31 @@ mongoose.connect('mongodb://localhost/laforge');
 const Schema = mongoose.Schema;
 
 
-const temperatureDataPoint = new Schema({
+const temperatureDataPointSchema = new Schema({
   date: Date,
   temperature: Number,
 });
 
-const TemperatureDataPoint = mongoose.connection.model('TemperatureDataPoint', temperatureDataPoint);
+const TemperatureDataPoint = mongoose.connection.model('TemperatureDataPoint', temperatureDataPointSchema);
 
-function log(temp) {
+
+const TargetDataPoint = mongoose.connection.model('TargetDataPoint', temperatureDataPointSchema);
+
+function getLocalDate(date) {
+  return new Date(date.getTime() - (new Date().getTimezoneOffset() * 60 * 1000));
+}
+
+function log(temp, target) {
+  const date = new Date();
   const tDP = new TemperatureDataPoint({
-    date: new Date(),
+    date,
     temperature: temp,
   });
-  return tDP.save();
+  const tDP2 = new TargetDataPoint({
+    date,
+    temperature: target,
+  });
+  return Promise.all([tDP.save(), tDP2.save()]);
 }
 
 function getTemperatures(date) {
@@ -29,8 +41,27 @@ function getTemperatures(date) {
   }).then((result) => {
     const ret = [];
     result.forEach((val) => {
+      new Date().getTimezoneOffset();
       ret.push({
-        x: val.date,
+        x: getLocalDate(val.date),
+        y: val.temperature,
+      });
+    });
+    return ret;
+  });
+}
+
+// TODO reduce redundancy
+function getTargets(date) {
+  return TargetDataPoint.find({
+    date: {
+      $gte: date,
+    },
+  }).then((result) => {
+    const ret = [];
+    result.forEach((val) => {
+      ret.push({
+        x: getLocalDate(val.date),
         y: val.temperature,
       });
     });
@@ -41,4 +72,5 @@ function getTemperatures(date) {
 module.exports = {
   log,
   getTemperatures,
+  getTargets,
 };

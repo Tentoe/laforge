@@ -7,8 +7,12 @@ const googleCalendar = require('./lib/googleCalendar');
 router.get('/', (req, res) => {
   const session = req.session;
   session.loggedIn = session.loggedIn || false;
-
-
+  if (!session.loggedIn) {
+    res.status(403).render('403', {
+      message: 'you have to be logged in',
+    });
+    return;
+  }
   if (req.query.code) { // store new Token TODO filter token with no refresh Token
     googleCalendar.storeNewToken(req.query.code).then(() => {
       res.render('googleCalendar', {

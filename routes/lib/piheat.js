@@ -98,26 +98,26 @@ function cancelAllJobs() {
 function getTemp() {
   return piio.getCelsius();
 }
+
 function getTarget() {
   return target;
 }
+
 function setNewTarget(t) {
   target = t;
   state.value = 0.5; // TODO set dynamically
   clearTimeout(cycleTimeout);
   setImmediate(cycleControl);
 }
+
 function refreshCalendar(newJobs) {
   cancelAllJobs();
   newJobs.forEach((val) => {
     const start = Date.parse(val.start.dateTime);
     const end = Date.parse(val.end.dateTime);
-    const now = new Date();
 
-            // do we have to heat now?
-    if ((start.valueOf() < now.valueOf()) && (end.valueOf() > now.valueOf())) {
-      module.exports.setNewTarget(parseFloat(val.summary));
-    }
+        // i dindn't check for ongoing events because i
+        // think thats not necessary
 
     jobs.push(schedule.scheduleJob(start, () => {
       module.exports.setNewTarget(parseFloat(val.summary)); // Day
@@ -139,7 +139,7 @@ setImmediate(cycleControl);
 
 function logger() {
   piio.getCelsius().then((temp) => {
-    database.log(temp); // TODO error hanlding
+    database.log(temp, target); // TODO error hanlding
   });
 }
 // every 10 minutes
