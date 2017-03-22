@@ -120,10 +120,10 @@ function refreshCalendar(newJobs) {
         // think thats not necessary
 
     jobs.push(schedule.scheduleJob(start, () => {
-      module.exports.setNewTarget(parseFloat(val.summary)); // Day
+      setNewTarget(parseFloat(val.summary)); // Day
     }));
     jobs.push(schedule.scheduleJob(end, () => {
-      module.exports.setNewTarget(nightTarget); // Night
+      setNewTarget(nightTarget); // Night
     }));
   });
 }
