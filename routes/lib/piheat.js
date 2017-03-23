@@ -1,6 +1,5 @@
-const piio = require('./piioDUMMY');
+const piio = require('./piio');
 const schedule = require('node-schedule');
-const database = require('./database');
 
 const nightTarget = 17;
 let target = 21;
@@ -134,13 +133,6 @@ module.exports = {
   getTarget,
   setNewTarget,
   refreshCalendar,
+  piio,
 };
 setImmediate(cycleControl);
-
-function logger() {
-  piio.getCelsius().then((temp) => {
-    database.log(temp, target); // TODO error hanlding
-  });
-}
-// every 10 minutes
-schedule.scheduleJob('*/10 * * * *', logger);

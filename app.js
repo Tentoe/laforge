@@ -55,8 +55,8 @@ app.use('/', require('./routes/routes'));
 
 
 https.createServer(cred, app).listen(app.get('portssl'), (err) => {
-  if (err) console.error(err);// eslint-disable-line no-console
-  else console.log(`https listening on port ${app.get('portssl')}`);// eslint-disable-line no-console
+  if (err) console.error(err); // eslint-disable-line no-console
+  else console.log(`https listening on port ${app.get('portssl')}`); // eslint-disable-line no-console
 });
 
 
@@ -70,6 +70,11 @@ http.createServer((req, res) => {
   res.end();
 }).listen(app.get('port'), (err) => {
   if (err) console.error(err); // eslint-disable-line no-console
-  else console.log(`http listening on port ${app.get('port')}`);// eslint-disable-line no-console
+  else console.log(`http listening on port ${app.get('port')}`); // eslint-disable-line no-console
 });
 // TODO implement proper logger
+
+
+const dataLogger = require('./routes/lib/dataLogger');
+
+dataLogger.starLogging();

@@ -11,16 +11,23 @@ const temperatureDataPointSchema = new Schema({
   temperature: Number,
 });
 
+const weatherDataPointSchema = new Schema({
+  date: Date,
+  temperature: Number,
+  pressure: Number,
+  humidity: Number,
+});
+
 const TemperatureDataPoint = mongoose.connection.model('TemperatureDataPoint', temperatureDataPointSchema);
-
-
 const TargetDataPoint = mongoose.connection.model('TargetDataPoint', temperatureDataPointSchema);
+
+const WeatherDataPoint = mongoose.connection.model('WeatherDataPoint', weatherDataPointSchema);
 
 function getLocalDate(date) {
   return new Date(date.getTime() - (new Date().getTimezoneOffset() * 60 * 1000));
 }
 
-function log(temp, target) {
+function logTemp(temp, target) {
   const date = new Date();
   const tDP = new TemperatureDataPoint({
     date,
@@ -33,12 +40,23 @@ function log(temp, target) {
   return Promise.all([tDP.save(), tDP2.save()]);
 }
 
+function logWeather(temperature, pressure, humidity) {
+  const date = new Date();
+  const wDP = new WeatherDataPoint({
+    date,
+    temperature,
+    pressure,
+    humidity,
+  });
+  return wDP.save();
+}
+
 function getTemperatures(date) {
   return TemperatureDataPoint.find({
     date: {
       $gte: date,
     },
-  }).then((result) => {
+  }).sort('date').then((result) => {
     const ret = [];
     result.forEach((val) => {
       new Date().getTimezoneOffset();
@@ -70,7 +88,8 @@ function getTargets(date) {
 }
 
 module.exports = {
-  log,
+  logTemp,
+  logWeather,
   getTemperatures,
   getTargets,
 };

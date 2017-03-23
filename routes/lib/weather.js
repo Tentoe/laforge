@@ -21,7 +21,7 @@ function getWeatherData() {
   return new Promise((resolve, reject) => {
     http.request(options, (response) => {
       response.pipe(concat((body) => {
-                // Data reception is done, do whatever with it!
+                // TODO check for correctness
         const parsed = JSON.parse(body);
         resolve(parsed);
       })).on('error', e => reject(e));
