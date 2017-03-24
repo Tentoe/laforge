@@ -1,4 +1,4 @@
-const piio = require('./piio');
+const piio = require('./piioDUMMY');
 const schedule = require('node-schedule');
 
 const nightTarget = 17;
@@ -104,7 +104,7 @@ function getTarget() {
 
 function setNewTarget(t) {
   target = t;
-  state.value = 0.5; // TODO set dynamically
+  state.value = 0.3; // TODO set dynamically
   clearTimeout(cycleTimeout);
   setImmediate(cycleControl);
 }

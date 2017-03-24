@@ -51,8 +51,9 @@ function logWeather(temperature, pressure, humidity) {
   return wDP.save();
 }
 
-function getTemperatures(date) {
-  return TemperatureDataPoint.find({
+
+function getTemperatureData(dataType, date) {
+  return dataType.find({
     date: {
       $gte: date,
     },
@@ -69,22 +70,17 @@ function getTemperatures(date) {
   });
 }
 
-// TODO reduce redundancy
+function getTemperatures(date) {
+  return getTemperatureData(TemperatureDataPoint, date);
+}
+
+
 function getTargets(date) {
-  return TargetDataPoint.find({
-    date: {
-      $gte: date,
-    },
-  }).then((result) => {
-    const ret = [];
-    result.forEach((val) => {
-      ret.push({
-        x: getLocalDate(val.date),
-        y: val.temperature,
-      });
-    });
-    return ret;
-  });
+  return getTemperatureData(TargetDataPoint, date);
+}
+
+function getWeather(date) {
+  return getTemperatureData(WeatherDataPoint, date);
 }
 
 module.exports = {
@@ -92,4 +88,5 @@ module.exports = {
   logWeather,
   getTemperatures,
   getTargets,
+  getWeather,
 };

@@ -19,7 +19,7 @@ const options = {
 
 function getWeatherData() {
   return new Promise((resolve, reject) => {
-    http.request(options, (response) => {
+    http.request(options, (response) => { // TODO use jquery
       response.pipe(concat((body) => {
                 // TODO check for correctness
         const parsed = JSON.parse(body);

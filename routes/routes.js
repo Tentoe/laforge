@@ -13,7 +13,7 @@ router.post('/', home.post);
 router.get('/logout', require('./logout'));
 router.use('/google', require('./calendarConfig'));
 
-router.get('/getChartData', ajax.getChartData);
+router.get('/getChartData', ajax.getChartData); // TODO use router
 
 // catch 404 and forward to error handler
 router.use((req, res, next) => {
