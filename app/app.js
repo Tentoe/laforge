@@ -1,6 +1,3 @@
-// add __dirname to module search path
-require('app-module-path').addPath(__dirname);
-
 const https = require('https');
 const fs = require('fs');
 const path = require('path');
