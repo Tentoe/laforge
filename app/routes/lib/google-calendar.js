@@ -17,7 +17,7 @@ let credentials = null;
 // If modifying these scopes, delete your previously saved credentials
 // at ~/.credentials/calendar-nodejs-quickstart.json
 const SCOPES = ['https://www.googleapis.com/auth/calendar.readonly'];
-const TOKEN_DIR = path.join(process.cwd(), `token${path.sep}`);
+const TOKEN_DIR = path.join('app', `token${path.sep}`);
 const TOKEN_PATH = `${TOKEN_DIR}calendar-nodejs.json`;
 const URLPARAMS = {
   access_type: 'offline',
@@ -35,7 +35,7 @@ function getOauth2Client(creds) {
   return new auth.OAuth2(clientId, clientSecret, redirectUrl);
 }
 // Load client secrets from a local file.
-fs.readFile(path.join(process.cwd(), 'client_secret.json'),
+fs.readFile(path.join('app', 'client_secret.json'),
     (err, content) => {
       if (err) { // TODO error handling
         console.log(`Error loading client secret file: ${err}`); // eslint-disable-line no-console

@@ -2,9 +2,9 @@
   "name": "laforge",
   "version": "1.0.0",
   "description": "A System to control my radiator with a Raspberry Pi over a web interface. ",
-  "main": "app.js",
+  "main": "app/app.js",
   "scripts": {
-    "start": "node app.js",
+    "start": "node app/app.js",
     "test": "./node_modules/mocha/bin/mocha"
   },
   "repository": {
