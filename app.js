@@ -75,6 +75,6 @@ http.createServer((req, res) => {
 // TODO implement proper logger
 
 
-const dataLogger = require('./routes/lib/dataLogger');
+const dataLogger = require('./routes/lib/data-logger');
 
 dataLogger.starLogging();

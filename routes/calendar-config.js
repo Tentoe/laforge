@@ -2,7 +2,7 @@ const express = require('express');
 
 const router = express.Router();
 
-const googleCalendar = require('./lib/googleCalendar');
+const googleCalendar = require('./lib/google-calendar');
 
 router.get('/', (req, res) => {
   const session = req.session;

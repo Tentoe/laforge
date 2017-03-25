@@ -1,3 +1,4 @@
+// TODO put this file in root folder
 const express = require('express');
 
 const home = require('./home');
@@ -11,7 +12,7 @@ const router = express.Router();
 router.get('/', home.get);
 router.post('/', home.post);
 router.get('/logout', require('./logout'));
-router.use('/google', require('./calendarConfig'));
+router.use('/google', require('./calendar-config'));
 
 router.get('/getChartData', ajax.getChartData); // TODO use router
 
