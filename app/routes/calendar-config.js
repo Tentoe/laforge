@@ -15,13 +15,13 @@ router.get('/', (req, res) => {
   }
   if (req.query.code) { // store new Token TODO filter token with no refresh Token
     googleCalendar.storeNewToken(req.query.code).then(() => {
-      res.render('googleCalendar', {
+      res.render('google-calendar', {
         loggedIn: req.session.loggedIn,
         message: 'new Token stored',
         authUrl: googleCalendar.getAuthUrl(),
       });
     }).catch((err) => {
-      res.render('googleCalendar', {
+      res.render('google-calendar', {
         loggedIn: req.session.loggedIn,
         message: `new token not stored because:${err.message}`,
         authUrl: googleCalendar.getAuthUrl(),
@@ -31,14 +31,14 @@ router.get('/', (req, res) => {
     const authUrl = googleCalendar.getAuthUrl();
     googleCalendar.getAccount()
             .then((acc) => {
-              res.render('googleCalendar', {
+              res.render('google-calendar', {
                 loggedIn: req.session.loggedIn,
                 message: acc,
                 authUrl,
               });
             })
             .catch((err) => {
-              res.render('googleCalendar', {
+              res.render('google-calendar', {
                 loggedIn: req.session.loggedIn,
                 message: `Error:${err.message}`,
                 authUrl,
