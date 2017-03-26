@@ -1,59 +1,43 @@
 const https = require('https');
-const fs = require('fs');
-const path = require('path');
 const express = require('express');
+const config = require('./config');
+const path = require('path');
 
 const app = express();
-const handlebars = require('express-handlebars').create({
-  defaultLayout: 'main',
-});
+const handlebars = require('express-handlebars').create(config.handlebars);
 
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const expressSession = require('express-session');
 
-const sslDir = 'ssl';
-const cred = {
-  key: fs.readFileSync(path.join(__dirname, sslDir, 'new.cert.key')),
-  cert: fs.readFileSync(path.join(__dirname, sslDir, 'new.cert.cert')),
-};
+
+const cred = config.cred;
 
 // middleware
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({
-  extended: false,
-}));
+app.use(bodyParser.urlencoded(config.bodyParser));
 app.use(cookieParser());
-app.use(expressSession({
-  secret: 'a long save secret, that noone can guess',
-  resave: false,
-  rolling: true,
-  saveUninitialized: false,
-  cookie: {
-    maxAge: 600000,
-  },
-}));
+app.use(expressSession(config.express));
 
 
 // engine
 app.engine('handlebars', handlebars.engine);
 
-app.set('port', process.env.PORT || 3333);
-app.set('portssl', process.env.PORTSSL || 4444);
+app.set('config', config);
 
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'handlebars');
+app.set('view engine', config.viewEngine);
 
 // statics
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(config.staticPath));
 
 // routes
-app.use('/', require('./routes/routes'));
+app.use('/', require('./routes/routes')); // TODO move routes to app folder
 
 
-https.createServer(cred, app).listen(app.get('portssl'), (err) => {
+https.createServer(cred, app).listen(config.shtmlPort, (err) => {
   if (err) console.error(err); // eslint-disable-line no-console
-  else console.log(`https listening on port ${app.get('portssl')}`); // eslint-disable-line no-console
+  else console.log(`https listening on port ${config.shtmlPort}`); // eslint-disable-line no-console
 });
 
 
@@ -65,13 +49,13 @@ http.createServer((req, res) => {
     Location: `https://${req.headers.host}${req.url}`,
   });
   res.end();
-}).listen(app.get('port'), (err) => {
+}).listen(config.htmlPort, (err) => {
   if (err) console.error(err); // eslint-disable-line no-console
-  else console.log(`http listening on port ${app.get('port')}`); // eslint-disable-line no-console
+  else console.log(`http listening on port ${config.htmlPort}`); // eslint-disable-line no-console
 });
 // TODO implement proper logger
 
-
+// start Logging temperature data
 const dataLogger = require('./routes/lib/data-logger');
 
 dataLogger.starLogging();
