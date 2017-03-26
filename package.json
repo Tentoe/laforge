@@ -4,7 +4,7 @@
   "description": "A System to control my radiator with a Raspberry Pi over a web interface. ",
   "main": "app/app.js",
   "scripts": {
-    "start": "node app/app.js",
+    "start": "NODE_ENV=production node app/app.js",
     "dev": "NODE_ENV=development node app/app.js",
     "test": "./node_modules/mocha/bin/mocha"
   },
