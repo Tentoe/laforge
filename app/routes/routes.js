@@ -2,7 +2,7 @@
 const express = require('express');
 
 const home = require('./home');
-const ajax = require('./lib/ajax');
+const ajax = require('database/ajax'); // eslint-disable-line
 
 
 const router = express.Router();

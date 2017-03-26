@@ -1,3 +1,5 @@
+require('app-module-path').addPath(__dirname);
+
 const https = require('https');
 const express = require('express');
 const config = require('./config');
@@ -56,6 +58,6 @@ http.createServer((req, res) => {
 // TODO implement proper logger
 
 // start Logging temperature data
-const dataLogger = require('./routes/lib/data-logger');
+const dataLogger = require('database/data-logger'); // eslint-disable-line 
 
 dataLogger.starLogging();

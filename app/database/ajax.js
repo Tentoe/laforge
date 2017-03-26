@@ -1,4 +1,4 @@
-const database = require('./database');
+const database = require('database/database'); // eslint-disable-line
 
 function getChartData(req, res) {
     // data from last 24h

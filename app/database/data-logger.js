@@ -1,9 +1,9 @@
 // TODO maybe put in other folder
 
 const schedule = require('node-schedule');
-const database = require('./database');
-const piheat = require('./piheat');
-const weather = require('./weather');
+const database = require('database/database'); // eslint-disable-line
+const piheat = require('routes/lib/piheat'); // eslint-disable-line
+const weather = require('routes/lib/weather'); // eslint-disable-line 
 
 const piio = piheat.piio;
 
