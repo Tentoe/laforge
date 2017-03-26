@@ -1,7 +1,9 @@
+const config = global.config;
+
 const mongoose = require('mongoose');
 
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost/laforge');
+mongoose.connect(config.db);
 
 const Schema = mongoose.Schema;
 

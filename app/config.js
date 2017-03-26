@@ -1,4 +1,5 @@
 const config = module.exports;
+
 const path = require('path');
 const fs = require('fs');
 
@@ -39,3 +40,5 @@ config.handlebars = {
 };
 
 config.staticPath = path.join(__dirname, '..', 'public');
+
+config.db = 'mongodb://localhost/laforge';

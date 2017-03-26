@@ -2,8 +2,8 @@
 
 const schedule = require('node-schedule');
 const database = require('database/database'); // eslint-disable-line
-const piheat = require('routes/lib/piheat'); // eslint-disable-line
-const weather = require('routes/lib/weather'); // eslint-disable-line 
+const piheat = require('heating/piheat'); // eslint-disable-line
+const weather = require('routes/lib/weather'); // eslint-disable-line
 
 const piio = piheat.piio;
 

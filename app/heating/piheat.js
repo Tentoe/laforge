@@ -1,4 +1,6 @@
-const piio = require('./piioDUMMY');
+const piio = process.env.NODE_ENV && process.env.NODE_ENV.search('dev') === -1 ?
+    require('heating/piio') : require('heating/piioDUMMY'); // eslint-disable-line
+
 const schedule = require('node-schedule');
 
 const nightTarget = 17;

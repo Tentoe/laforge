@@ -1,5 +1,5 @@
 /* eslint-env node, mocha */
-const piheat = require('../routes/lib/piheat');
+const piheat = require('heating/piheat'); // eslint-disable-line
 const assert = require('assert');
 
 describe('piheat', () => {

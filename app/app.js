@@ -1,9 +1,11 @@
 require('app-module-path').addPath(__dirname);
 
+const config = require('./config');
 const https = require('https');
 const express = require('express');
-const config = require('./config');
 const path = require('path');
+
+global.config = config;
 
 const app = express();
 const handlebars = require('express-handlebars').create(config.handlebars);
@@ -25,7 +27,6 @@ app.use(expressSession(config.express));
 // engine
 app.engine('handlebars', handlebars.engine);
 
-app.set('config', config);
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', config.viewEngine);
@@ -58,6 +59,6 @@ http.createServer((req, res) => {
 // TODO implement proper logger
 
 // start Logging temperature data
-const dataLogger = require('database/data-logger'); // eslint-disable-line 
+const dataLogger = require('database/data-logger'); // eslint-disable-line
 
 dataLogger.starLogging();

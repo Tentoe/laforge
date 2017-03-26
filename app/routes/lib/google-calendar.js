@@ -1,14 +1,12 @@
 // TODO split logic from the router
 
 
-// const piheat = require('../piheat');
 const fs = require('fs');
-// const readline = require('readline');
 const googleApis = require('googleapis');
 const googleAuth = require('google-auth-library');
 const path = require('path');
 const schedule = require('node-schedule');
-const piheat = require('./piheat');
+const piheat = require('heating/piheat'); // eslint-disable-line
 
 const calendar = googleApis.calendar('v3');
 

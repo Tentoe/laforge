@@ -1,4 +1,4 @@
-const piheat = require('./lib/piheat');
+const piheat = require('heating/piheat'); // eslint-disable-line
 const fs = require('fs');
 const crypto = require('crypto');
 
