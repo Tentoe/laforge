@@ -4,8 +4,15 @@ const config = require('./config');
 const https = require('https');
 const express = require('express');
 const path = require('path');
+const fs = require('fs');
 
 global.config = config;
+
+// load config.json
+fs.readFile(config.configJSON, (err, data) => {
+  if (err) throw err;
+  global.configJSON = JSON.parse(data); // TODO error hanlding
+});
 
 const app = express();
 const handlebars = require('express-handlebars').create(config.handlebars);

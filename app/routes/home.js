@@ -1,6 +1,5 @@
 const piheat = require('heating/piheat'); // eslint-disable-line
-const fs = require('fs');
-const crypto = require('crypto');
+const password = require('lib/password'); // eslint-disable-line
 
 function getVars(session) {
   return piheat.getTemp().then(temp => ({
@@ -10,18 +9,7 @@ function getVars(session) {
   }));
 }
 
-function md5hash(str) {
-  return crypto.createHash('md5').update(str).digest('hex');
-}
-
-function passwordValid(pass) { // TODO assync
-  const passwords = fs.readFileSync('passwords.md5').toString().split(/\r?\n/).reduce((acc, val) => // eslint-disable-line no-confusing-arrow
-        val !== '' ? acc.concat(val) : acc // remove all empty strings (eof creates an empty string)
-        , []);
-
-  return passwords.some(p => p === pass);
-}
-
+// TODO split function definition and exports
 module.exports = {
   get(req, res) {
     const session = req.session;
@@ -31,20 +19,22 @@ module.exports = {
     }); // TODO Catch
   },
   post(req, res) {
+    function renderHome() {
+      if (req.body.target && req.session.loggedIn) {
+        piheat.setNewTarget(parseFloat(req.body.target));
+      }
+
+
+      getVars(req.session).then((val) => {
+        res.render('home', val);
+      }); // TODO Catch
+    }
+
     if (req.body.password) {
       const session = req.session;
-      const body = req.body;
-      body.password = md5hash(req.body.password);
-      session.loggedIn = passwordValid(req.body.password);
-    }
-
-    if (req.body.target && req.session.loggedIn) {
-      piheat.setNewTarget(parseFloat(req.body.target));
-    }
-
-
-    getVars(req.session).then((val) => {
-      res.render('home', val);
-    }); // TODO Catch
+      password.checkPassword(req.body.password).then((passed) => {
+        session.loggedIn = passed;
+      }).then(renderHome);// TODO error handling
+    } else renderHome();
   },
 };

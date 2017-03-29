@@ -42,3 +42,5 @@ config.handlebars = {
 config.staticPath = path.join(__dirname, '..', 'public');
 
 config.db = 'mongodb://localhost/laforge';
+
+config.configJSON = 'app/config.json';
