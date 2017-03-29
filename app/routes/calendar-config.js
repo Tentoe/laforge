@@ -2,7 +2,7 @@ const express = require('express');
 
 const router = express.Router();
 
-const googleCalendar = require('./lib/google-calendar');
+const googleCalendar = require('apis/google-calendar'); // eslint-disable-line
 
 router.get('/', (req, res) => {
   const session = req.session;

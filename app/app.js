@@ -35,7 +35,7 @@ app.set('view engine', config.viewEngine);
 app.use(express.static(config.staticPath));
 
 // routes
-app.use('/', require('./routes/routes')); // TODO move routes to app folder
+app.use('/', require('./routes')); // TODO move routes to app folder
 
 
 https.createServer(cred, app).listen(config.shtmlPort, (err) => {

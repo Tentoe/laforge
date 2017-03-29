@@ -1,7 +1,7 @@
 // TODO put this file in root folder
 const express = require('express');
 
-const home = require('./home');
+const home = require('./routes/home');
 const ajax = require('database/ajax'); // eslint-disable-line
 
 
@@ -11,8 +11,8 @@ const router = express.Router();
 // Get Homepage
 router.get('/', home.get);
 router.post('/', home.post);
-router.get('/logout', require('./logout'));
-router.use('/google', require('./calendar-config'));
+router.get('/logout', require('./routes/logout'));
+router.use('/google', require('./routes/calendar-config'));
 
 router.get('/getChartData', ajax.getChartData); // TODO use router
 
