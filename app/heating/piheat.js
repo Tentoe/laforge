@@ -93,8 +93,7 @@ function cycleControl() {
           const diff = target - data;
           if (diff < -targetTolerance) piio.setHeating(true);
           else piio.setHeating(false);
-        },
-    );
+        });
   cycleTimeout = setTimeout(cycleControl, cycleDuration);
 }
 
@@ -128,8 +127,8 @@ function refreshCalendar(newJobs) {
     const start = Date.parse(val.start.dateTime);
     const end = Date.parse(val.end.dateTime);
 
-        // i dindn't check for ongoing events because i
-        // think thats not necessary
+            // i dindn't check for ongoing events because i
+            // think thats not necessary
 
     jobs.push(schedule.scheduleJob(start, () => {
       setNewTarget(parseFloat(val.summary)); // Day
