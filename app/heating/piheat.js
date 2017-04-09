@@ -6,12 +6,10 @@ const schedule = require('node-schedule');
 const nightTarget = 17;
 let target = 21;
 
-const on = false; // TODO read back value
 const cycleDuration = 1000 * 60 * 10; // 10 min
 
 const targetTolerance = 0.5; // in °C
 
-const lastTemp = target;
 const jobs = [];
 
 const state = {
@@ -24,76 +22,10 @@ const state = {
 let cycleTimeout = null;
 
 
-function valueInTolerance(value) {
-  const diff = value - target;
-
-  if (Math.abs(diff) > targetTolerance) return false;
-  return true;
-}
-
-function fixMinMax(value) {
-  if (value < state.min) return state.min;
-  else if (value > state.max) return state.max;
-
-  return value;
-}
-/*
-function cycleControl() {
-  piio.getCelsius().then((data) => {
-    const targetDiv = data - target;
-
-    const lastTempBuffer = lastTemp;
-    lastTemp = data;
-
-        // Heat/Cool until we are in targetMargin
-    if (!valueInTolerance(data)) {
-            // adjust state
-      if (valueInTolerance(lastTempBuffer)) {
-        if (targetDiv < 0) {
-          state.value += state.step;
-        } else {
-          state.value -= state.step;
-        }
-
-        state.value = fixMinMax(state.value);
-      }
-
-
-      if (targetDiv < 0) {
-        on = true;
-        piio.setHeating(on);
-                // TODO  console.log("heating to margin");
-      } else {
-        on = false;
-        piio.setHeating(on);
-                // TODO  console.log("cooling to margin");
-      }
-
-      cycleTimeout = setTimeout(cycleControl, cycleDurationMargin);
-      return;
-    }
-
-        // TODO  console.log(state);
-
-
-    on = !on; // TODO read back value
-        // initiate cooling cycle
-    piio.setHeating(on);
-
-    const duration = on ? cycleDuration * state.value : cycleDuration * (1 - state.value);
-
-        // TODO  console.log("Heating:" + on + "for " + duration + "ms ");
-    cycleTimeout = setTimeout(cycleControl, duration);
-  });
-}
-*/
 function cycleControl() {
   piio.getCelsius().then(
         (data) => {
           const diff = data - target;
-          console.log(diff);
-          console.log(diff < -targetTolerance);
-
           if (diff < -targetTolerance) piio.setHeating(true);
           else piio.setHeating(false);
         });
