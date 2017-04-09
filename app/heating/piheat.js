@@ -6,13 +6,12 @@ const schedule = require('node-schedule');
 const nightTarget = 17;
 let target = 21;
 
-let on = false; // TODO read back value
+const on = false; // TODO read back value
 const cycleDuration = 1000 * 60 * 10; // 10 min
-const cycleDurationMargin = 1000 * 60 * 5; // 5 min
 
 const targetTolerance = 0.5; // in °C
 
-let lastTemp = target;
+const lastTemp = target;
 const jobs = [];
 
 const state = {
@@ -38,7 +37,7 @@ function fixMinMax(value) {
 
   return value;
 }
-
+/*
 function cycleControl() {
   piio.getCelsius().then((data) => {
     const targetDiv = data - target;
@@ -87,6 +86,18 @@ function cycleControl() {
     cycleTimeout = setTimeout(cycleControl, duration);
   });
 }
+*/
+function cycleControl() {
+  piio.getCelsius().then(
+        (data) => {
+          const diff = target - data;
+          if (diff < -targetTolerance) piio.setHeating(true);
+          else piio.setHeating(false);
+        },
+    );
+  cycleTimeout = setTimeout(cycleControl, cycleDuration);
+}
+
 
 function cancelAllJobs() {
   while (jobs.length > 0) {
