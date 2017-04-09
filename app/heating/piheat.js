@@ -91,6 +91,9 @@ function cycleControl() {
   piio.getCelsius().then(
         (data) => {
           const diff = data - target;
+          console.log(diff);
+          console.log(diff < -targetTolerance);
+
           if (diff < -targetTolerance) piio.setHeating(true);
           else piio.setHeating(false);
         });
